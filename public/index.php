@@ -3,6 +3,8 @@
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use App\CarrierTester;
+use Omniship\Common\Address;
+use Omniship\Common\Package;
 
 $tester = new CarrierTester(__DIR__ . '/../database/omniship.sqlite');
 
@@ -124,11 +126,32 @@ function renderTestForm(CarrierTester $tester, string $carrierName): void
     echo '<input type="hidden" name="carrier" value="' . htmlspecialchars($carrierName) . '">';
 
     echo '<h3 style="margin-bottom:15px">Carrier Credentials</h3>';
-    echo '<div class="form-row">';
-    echo '<div class="form-group"><label>Username</label><input type="text" name="username" placeholder="API Username"></div>';
-    echo '<div class="form-group"><label>Password</label><input type="password" name="password" placeholder="API Password"></div>';
-    echo '</div>';
+
+    if ($carrierName === 'KolayGelsin') {
+        echo '<div class="form-group"><label>API Token</label><input type="text" name="api_token" placeholder="Bearer API Token"></div>';
+        echo '<div class="form-row">';
+        echo '<div class="form-group"><label>Customer ID</label><input type="number" name="customer_id" placeholder="KolayGelsin Customer ID"></div>';
+        echo '<div class="form-group"><label>Address ID</label><input type="number" name="address_id" placeholder="Sender Address ID"></div>';
+        echo '</div>';
+    } else {
+        echo '<div class="form-row">';
+        echo '<div class="form-group"><label>Username</label><input type="text" name="username" placeholder="API Username"></div>';
+        echo '<div class="form-group"><label>Password</label><input type="password" name="password" placeholder="API Password"></div>';
+        echo '</div>';
+    }
+
     echo '<div class="form-group"><label>Test Mode</label><select name="test_mode"><option value="1">Yes (Sandbox)</option><option value="0">No (Production)</option></select></div>';
+
+    echo '<h3 style="margin:20px 0 15px">Shipment Reference</h3>';
+    echo '<div class="form-row">';
+    if ($carrierName === 'KolayGelsin') {
+        echo '<div class="form-group"><label>Customer Specific Code</label><input type="text" name="customer_specific_code" placeholder="Your reference code (optional)"></div>';
+        echo '<div class="form-group"><label>Package Type</label><select name="package_type"><option value="2">Koli (Box)</option><option value="1">Dosya (Document)</option></select></div>';
+    } else {
+        echo '<div class="form-group"><label>Cargo Key</label><input type="text" name="cargo_key" placeholder="Auto-generated if empty"></div>';
+        echo '<div class="form-group"><label>Invoice Key</label><input type="text" name="invoice_key" placeholder="Same as cargo key if empty"></div>';
+    }
+    echo '</div>';
 
     echo '<h3 style="margin:20px 0 15px">Sender</h3>';
     echo '<div class="form-row">';
@@ -179,54 +202,100 @@ function handleCreateShipment(CarrierTester $tester): void
     $carrierName = $_POST['carrier'] ?? '';
 
     try {
-        $carrier = $tester->createCarrier($carrierName, [
-            'username' => $_POST['username'] ?? '',
-            'password' => $_POST['password'] ?? '',
-            'testMode' => (bool) ($_POST['test_mode'] ?? true),
-        ]);
+        if ($carrierName === 'KolayGelsin') {
+            $carrierParams = [
+                'apiToken' => $_POST['api_token'] ?? '',
+                'customerId' => (int) ($_POST['customer_id'] ?? 0),
+                'addressId' => (int) ($_POST['address_id'] ?? 0),
+                'testMode' => (bool) ($_POST['test_mode'] ?? true),
+            ];
+        } else {
+            $carrierParams = [
+                'username' => $_POST['username'] ?? '',
+                'password' => $_POST['password'] ?? '',
+                'testMode' => (bool) ($_POST['test_mode'] ?? true),
+            ];
+        }
 
-        $requestData = [
-            'shipFrom' => [
-                'name' => $_POST['sender_name'] ?? '',
-                'phone' => $_POST['sender_phone'] ?? '',
-                'address1' => $_POST['sender_address'] ?? '',
-                'city' => $_POST['sender_city'] ?? '',
-                'district' => $_POST['sender_district'] ?? '',
-                'postalCode' => $_POST['sender_postal'] ?? '',
-                'country' => 'TR',
-            ],
-            'shipTo' => [
-                'name' => $_POST['receiver_name'] ?? '',
-                'phone' => $_POST['receiver_phone'] ?? '',
-                'address1' => $_POST['receiver_address'] ?? '',
-                'city' => $_POST['receiver_city'] ?? '',
-                'district' => $_POST['receiver_district'] ?? '',
-                'postalCode' => $_POST['receiver_postal'] ?? '',
-                'country' => 'TR',
-            ],
-            'packages' => [[
-                'weight' => (float) ($_POST['weight'] ?? 1),
-                'desi' => (float) ($_POST['desi'] ?? 1),
-                'length' => (float) ($_POST['length'] ?? 0),
-                'width' => (float) ($_POST['width'] ?? 0),
-                'height' => (float) ($_POST['height'] ?? 0),
-                'description' => $_POST['description'] ?? '',
-            ]],
-            'paymentType' => $_POST['payment_type'] ?? 'sender',
+        $carrier = $tester->createCarrier($carrierName, $carrierParams);
+
+        $shipFrom = new Address(
+            name: $_POST['sender_name'] ?? '',
+            street1: $_POST['sender_address'] ?? '',
+            city: $_POST['sender_city'] ?? '',
+            district: $_POST['sender_district'] ?? '',
+            postalCode: $_POST['sender_postal'] ?? '',
+            country: 'TR',
+            phone: $_POST['sender_phone'] ?? '',
+        );
+
+        $shipTo = new Address(
+            name: $_POST['receiver_name'] ?? '',
+            street1: $_POST['receiver_address'] ?? '',
+            city: $_POST['receiver_city'] ?? '',
+            district: $_POST['receiver_district'] ?? '',
+            postalCode: $_POST['receiver_postal'] ?? '',
+            country: 'TR',
+            phone: $_POST['receiver_phone'] ?? '',
+        );
+
+        $packages = [
+            new Package(
+                weight: (float) ($_POST['weight'] ?? 1),
+                desi: (float) ($_POST['desi'] ?? 1),
+                length: (float) ($_POST['length'] ?? 0) ?: null,
+                width: (float) ($_POST['width'] ?? 0) ?: null,
+                height: (float) ($_POST['height'] ?? 0) ?: null,
+                description: $_POST['description'] ?? '',
+            ),
         ];
 
-        $response = $carrier->createShipment($requestData);
+        if ($carrierName === 'KolayGelsin') {
+            $requestData = [
+                'shipTo' => $shipTo,
+                'packages' => $packages,
+                'customerSpecificCode' => $_POST['customer_specific_code'] ?? ('OMN-' . time()),
+                'packageType' => (int) ($_POST['package_type'] ?? 2),
+            ];
+        } else {
+            $cargoKey = $_POST['cargo_key'] ?? ('OMN-' . time());
+            $invoiceKey = $_POST['invoice_key'] ?? $cargoKey;
+            $requestData = [
+                'shipFrom' => $shipFrom,
+                'shipTo' => $shipTo,
+                'packages' => $packages,
+                'cargoKey' => $cargoKey,
+                'invoiceKey' => $invoiceKey,
+            ];
+        }
+
+        $response = $carrier->createShipment($requestData)->send();
 
         $responseData = [
             'successful' => $response->isSuccessful(),
-            'tracking_number' => $response->getTrackingNumber(),
-            'barcode' => $response->getBarcode(),
-            'shipment_id' => $response->getShipmentId(),
+            'tracking_number' => method_exists($response, 'getTrackingNumber') ? $response->getTrackingNumber() : null,
+            'barcode' => method_exists($response, 'getBarcode') ? $response->getBarcode() : null,
+            'shipment_id' => method_exists($response, 'getShipmentId') ? $response->getShipmentId() : null,
             'message' => $response->getMessage(),
-            'data' => $response->getData(),
         ];
 
-        $id = $tester->saveShipment($carrierName, $requestData, $responseData);
+        if ($carrierName === 'KolayGelsin') {
+            $savedRequestData = [
+                'carrier' => $carrierName,
+                'customerSpecificCode' => $requestData['customerSpecificCode'] ?? null,
+                'shipTo' => $shipTo->toArray(),
+            ];
+        } else {
+            $savedRequestData = [
+                'carrier' => $carrierName,
+                'cargoKey' => $cargoKey,
+                'invoiceKey' => $invoiceKey,
+                'shipTo' => $shipTo->toArray(),
+                'shipFrom' => $shipFrom->toArray(),
+            ];
+        }
+
+        $id = $tester->saveShipment($carrierName, $savedRequestData, $responseData);
 
         if ($response->isSuccessful()) {
             echo '<div class="alert alert-success">Shipment created successfully!</div>';
@@ -255,24 +324,38 @@ function handleTrack(CarrierTester $tester): void
         echo '<form method="GET" action="/">';
         echo '<input type="hidden" name="action" value="track">';
         echo '<input type="hidden" name="carrier" value="' . htmlspecialchars($carrierName) . '">';
-        echo '<div class="form-row">';
-        echo '<div class="form-group"><label>Username</label><input type="text" name="username" placeholder="API Username"></div>';
-        echo '<div class="form-group"><label>Password</label><input type="password" name="password" placeholder="API Password"></div>';
-        echo '</div>';
-        echo '<div class="form-group"><label>Tracking Number</label><input type="text" name="tracking" placeholder="Enter tracking number" required></div>';
+        if ($carrierName === 'KolayGelsin') {
+            echo '<div class="form-group"><label>API Token</label><input type="text" name="api_token" placeholder="Bearer API Token"></div>';
+        } else {
+            echo '<div class="form-row">';
+            echo '<div class="form-group"><label>Username</label><input type="text" name="username" placeholder="API Username"></div>';
+            echo '<div class="form-group"><label>Password</label><input type="password" name="password" placeholder="API Password"></div>';
+            echo '</div>';
+        }
+        echo '<div class="form-group"><label>Tracking Number / Shipment ID</label><input type="text" name="tracking" placeholder="Enter tracking number or shipment ID" required></div>';
         echo '<button type="submit" class="btn">Track</button>';
         echo '</form></div>';
         return;
     }
 
     try {
-        $carrier = $tester->createCarrier($carrierName, [
-            'username' => $_GET['username'] ?? '',
-            'password' => $_GET['password'] ?? '',
-            'testMode' => true,
-        ]);
+        if ($carrierName === 'KolayGelsin') {
+            $carrier = $tester->createCarrier($carrierName, [
+                'apiToken' => $_GET['api_token'] ?? '',
+                'testMode' => true,
+            ]);
+        } else {
+            $carrier = $tester->createCarrier($carrierName, [
+                'username' => $_GET['username'] ?? '',
+                'password' => $_GET['password'] ?? '',
+                'testMode' => true,
+            ]);
+        }
 
-        $response = $carrier->getTrackingStatus(['trackingNumber' => $trackingNumber]);
+        $trackingParams = ($carrierName === 'KolayGelsin')
+            ? ['shipmentId' => $trackingNumber]
+            : ['trackingNumber' => $trackingNumber];
+        $response = $carrier->getTrackingStatus($trackingParams)->send();
 
         echo "<h2>Tracking: {$trackingNumber}</h2>";
 
@@ -283,7 +366,7 @@ function handleTrack(CarrierTester $tester): void
             echo '<table><thead><tr><th>Date</th><th>Status</th><th>Location</th><th>Description</th></tr></thead><tbody>';
             foreach ($info->events as $event) {
                 echo '<tr>';
-                echo '<td>' . htmlspecialchars($event->dateTime->format('Y-m-d H:i')) . '</td>';
+                echo '<td>' . htmlspecialchars($event->occurredAt->format('Y-m-d H:i')) . '</td>';
                 echo '<td><span class="badge badge-' . strtolower($event->status->value) . '">' . $event->status->value . '</span></td>';
                 echo '<td>' . htmlspecialchars($event->location ?? '-') . '</td>';
                 echo '<td>' . htmlspecialchars($event->description) . '</td>';
