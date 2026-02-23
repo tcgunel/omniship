@@ -1,0 +1,8 @@
+parameters:
+    level: 8
+    paths:
+        - src
+    tmpDir: .phpstan-cache
+    ignoreErrors:
+        - identifier: trait.unused
+        - identifier: function.alreadyNarrowedType
