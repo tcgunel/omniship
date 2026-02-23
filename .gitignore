@@ -1,6 +1,10 @@
 # Dependencies
 /vendor/
 
+# Sub-packages (separate git repos)
+/omniship/
+/omniship-yurtici/
+
 # Docker
 docker-compose.override.yml
 
@@ -26,6 +30,9 @@ composer.lock
 .phpunit.result.cache
 .pest-cache/
 /coverage/
+
+# Database
+database/*.sqlite
 
 # Environment
 .env
