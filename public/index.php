@@ -127,6 +127,13 @@ function renderTestForm(CarrierTester $tester, string $carrierName): void
 
     echo '<h3 style="margin-bottom:15px">Carrier Credentials</h3>';
 
+    $username = $password = '';
+
+    if ($carrierName === 'Aras'){
+        $username = 'neodyum';
+        $password = 'nd2580';
+    }
+
     if ($carrierName === 'KolayGelsin') {
         echo '<div class="form-group"><label>API Token</label><input type="text" name="api_token" placeholder="Bearer API Token"></div>';
         echo '<div class="form-row">';
@@ -135,8 +142,8 @@ function renderTestForm(CarrierTester $tester, string $carrierName): void
         echo '</div>';
     } else {
         echo '<div class="form-row">';
-        echo '<div class="form-group"><label>Username</label><input type="text" name="username" placeholder="API Username"></div>';
-        echo '<div class="form-group"><label>Password</label><input type="password" name="password" placeholder="API Password"></div>';
+        echo '<div class="form-group"><label>Username</label><input type="text" name="username" placeholder="API Username" value="'.$username.'"></div>';
+        echo '<div class="form-group"><label>Password</label><input type="password" name="password" placeholder="API Password" value="'.$password.'"></div>';
         echo '</div>';
     }
 
@@ -150,6 +157,7 @@ function renderTestForm(CarrierTester $tester, string $carrierName): void
     } elseif ($carrierName === 'Aras') {
         echo '<div class="form-group"><label>Integration Code</label><input type="text" name="integration_code" placeholder="Order/integration code (required)"></div>';
         echo '<div class="form-group"><label>Invoice Number</label><input type="text" name="invoice_number" placeholder="Same as integration code if empty"></div>';
+        echo '<div class="form-group"><label>Barcodes (comma-separated, one per piece)</label><input type="text" name="barcodes" placeholder="e.g. ABC123,ABC124"></div>';
     } else {
         echo '<div class="form-group"><label>Cargo Key</label><input type="text" name="cargo_key" placeholder="Auto-generated if empty"></div>';
         echo '<div class="form-group"><label>Invoice Key</label><input type="text" name="invoice_key" placeholder="Same as cargo key if empty"></div>';
@@ -263,12 +271,14 @@ function handleCreateShipment(CarrierTester $tester): void
         } elseif ($carrierName === 'Aras') {
             $integrationCode = $_POST['integration_code'] ?? ('OMN-' . time());
             $invoiceNumber = $_POST['invoice_number'] ?: $integrationCode;
+            $barcodes = array_filter(array_map('trim', explode(',', $_POST['barcodes'] ?? '')));
             $requestData = [
                 'shipTo' => $shipTo,
                 'packages' => $packages,
                 'integrationCode' => $integrationCode,
                 'invoiceNumber' => $invoiceNumber,
                 'tradingWaybillNumber' => $integrationCode,
+                'barcodes' => $barcodes,
             ];
         } else {
             $cargoKey = $_POST['cargo_key'] ?? ('OMN-' . time());
@@ -338,6 +348,13 @@ function handleTrack(CarrierTester $tester): void
     $carrierName = $_GET['carrier'] ?? '';
     $trackingNumber = $_GET['tracking'] ?? '';
 
+    $username = $password = '';
+
+    if ($carrierName === 'Aras'){
+        $username = 'neodyum';
+        $password = 'nd2580';
+    }
+
     if (empty($trackingNumber)) {
         echo "<h2>Track Shipment - {$carrierName}</h2>";
         echo '<div class="card">';
@@ -348,8 +365,8 @@ function handleTrack(CarrierTester $tester): void
             echo '<div class="form-group"><label>API Token</label><input type="text" name="api_token" placeholder="Bearer API Token"></div>';
         } else {
             echo '<div class="form-row">';
-            echo '<div class="form-group"><label>Username</label><input type="text" name="username" placeholder="API Username"></div>';
-            echo '<div class="form-group"><label>Password</label><input type="password" name="password" placeholder="API Password"></div>';
+            echo '<div class="form-group"><label>Username</label><input type="text" name="username" placeholder="API Username" value="'.$username.'"></div>';
+            echo '<div class="form-group"><label>Password</label><input type="password" name="password" placeholder="API Password" value="'.$password.'"></div>';
             echo '</div>';
         }
         echo '<div class="form-group"><label>Tracking Number / Shipment ID</label><input type="text" name="tracking" placeholder="Enter tracking number or shipment ID" required></div>';
