@@ -50,6 +50,7 @@ class CarrierTester
         return [
             'Yurtici' => 'Yurtiçi Kargo (SOAP)',
             'KolayGelsin' => 'Kolay Gelsin (REST)',
+            'Aras' => 'Aras Kargo (SOAP/REST)',
         ];
     }
 

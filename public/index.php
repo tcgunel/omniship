@@ -147,6 +147,9 @@ function renderTestForm(CarrierTester $tester, string $carrierName): void
     if ($carrierName === 'KolayGelsin') {
         echo '<div class="form-group"><label>Customer Specific Code</label><input type="text" name="customer_specific_code" placeholder="Your reference code (optional)"></div>';
         echo '<div class="form-group"><label>Package Type</label><select name="package_type"><option value="2">Koli (Box)</option><option value="1">Dosya (Document)</option></select></div>';
+    } elseif ($carrierName === 'Aras') {
+        echo '<div class="form-group"><label>Integration Code</label><input type="text" name="integration_code" placeholder="Order/integration code (required)"></div>';
+        echo '<div class="form-group"><label>Invoice Number</label><input type="text" name="invoice_number" placeholder="Same as integration code if empty"></div>';
     } else {
         echo '<div class="form-group"><label>Cargo Key</label><input type="text" name="cargo_key" placeholder="Auto-generated if empty"></div>';
         echo '<div class="form-group"><label>Invoice Key</label><input type="text" name="invoice_key" placeholder="Same as cargo key if empty"></div>';
@@ -257,6 +260,16 @@ function handleCreateShipment(CarrierTester $tester): void
                 'customerSpecificCode' => $_POST['customer_specific_code'] ?? ('OMN-' . time()),
                 'packageType' => (int) ($_POST['package_type'] ?? 2),
             ];
+        } elseif ($carrierName === 'Aras') {
+            $integrationCode = $_POST['integration_code'] ?? ('OMN-' . time());
+            $invoiceNumber = $_POST['invoice_number'] ?: $integrationCode;
+            $requestData = [
+                'shipTo' => $shipTo,
+                'packages' => $packages,
+                'integrationCode' => $integrationCode,
+                'invoiceNumber' => $invoiceNumber,
+                'tradingWaybillNumber' => $integrationCode,
+            ];
         } else {
             $cargoKey = $_POST['cargo_key'] ?? ('OMN-' . time());
             $invoiceKey = $_POST['invoice_key'] ?? $cargoKey;
@@ -283,6 +296,13 @@ function handleCreateShipment(CarrierTester $tester): void
             $savedRequestData = [
                 'carrier' => $carrierName,
                 'customerSpecificCode' => $requestData['customerSpecificCode'] ?? null,
+                'shipTo' => $shipTo->toArray(),
+            ];
+        } elseif ($carrierName === 'Aras') {
+            $savedRequestData = [
+                'carrier' => $carrierName,
+                'integrationCode' => $integrationCode,
+                'invoiceNumber' => $invoiceNumber,
                 'shipTo' => $shipTo->toArray(),
             ];
         } else {
