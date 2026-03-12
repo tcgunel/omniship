@@ -127,18 +127,25 @@ function renderTestForm(CarrierTester $tester, string $carrierName): void
 
     echo '<h3 style="margin-bottom:15px">Carrier Credentials</h3>';
 
-    $username = $password = '';
+    $username = $password = $api_token = $address_id = $customer_id = '';
 
     if ($carrierName === 'Aras'){
         $username = 'neodyum';
         $password = 'nd2580';
+    }else if ($carrierName === 'Yurtici'){
+        $username = 'YKTEST';
+        $password = 'YK';
+    }else if ($carrierName === 'KolayGelsin'){
+        $api_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1bmlxdWVfbmFtZSI6IjI5ODM5MjA1MTEwIiwiY2hhbm5lbCI6IkludGVncmF0aW9uIiwiZW52aXJvbm1lbnQiOiJpbnRlZ3JhdGlvbiIsImlzcyI6ImxvY2FsaG9zdCIsImF1ZCI6ImFsbCIsImV4cCI6MTgwMzQwNDkwMCwibmJmIjoxNzcxODY4OTAwfQ.NmPbi6dLesP4PJUwUqf-CYKTdE_4z_hIkYJH8cpcuos';
+        $address_id = '754026';
+        $customer_id = '789217';
     }
 
     if ($carrierName === 'KolayGelsin') {
-        echo '<div class="form-group"><label>API Token</label><input type="text" name="api_token" placeholder="Bearer API Token"></div>';
+        echo '<div class="form-group"><label>API Token</label><input type="text" name="api_token" placeholder="Bearer API Token" value="'.$api_token.'"></div>';
         echo '<div class="form-row">';
-        echo '<div class="form-group"><label>Customer ID</label><input type="number" name="customer_id" placeholder="KolayGelsin Customer ID"></div>';
-        echo '<div class="form-group"><label>Address ID</label><input type="number" name="address_id" placeholder="Sender Address ID"></div>';
+        echo '<div class="form-group"><label>Customer ID</label><input type="number" name="customer_id" placeholder="KolayGelsin Customer ID" value="'.$customer_id.'"></div>';
+        echo '<div class="form-group"><label>Address ID</label><input type="number" name="address_id" placeholder="Sender Address ID" value="'.$address_id.'"></div>';
         echo '</div>';
     } else {
         echo '<div class="form-row">';
@@ -348,11 +355,16 @@ function handleTrack(CarrierTester $tester): void
     $carrierName = $_GET['carrier'] ?? '';
     $trackingNumber = $_GET['tracking'] ?? '';
 
-    $username = $password = '';
+    $username = $password = $api_token = '';
 
     if ($carrierName === 'Aras'){
         $username = 'neodyum';
         $password = 'nd2580';
+    }else if ($carrierName === 'Yurtici'){
+        $username = 'YKTEST';
+        $password = 'YK';
+    }else if ($carrierName === 'KolayGelsin'){
+        $api_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1bmlxdWVfbmFtZSI6IjI5ODM5MjA1MTEwIiwiY2hhbm5lbCI6IkludGVncmF0aW9uIiwiZW52aXJvbm1lbnQiOiJpbnRlZ3JhdGlvbiIsImlzcyI6ImxvY2FsaG9zdCIsImF1ZCI6ImFsbCIsImV4cCI6MTgwMzQwNDkwMCwibmJmIjoxNzcxODY4OTAwfQ.NmPbi6dLesP4PJUwUqf-CYKTdE_4z_hIkYJH8cpcuos';
     }
 
     if (empty($trackingNumber)) {
@@ -362,7 +374,7 @@ function handleTrack(CarrierTester $tester): void
         echo '<input type="hidden" name="action" value="track">';
         echo '<input type="hidden" name="carrier" value="' . htmlspecialchars($carrierName) . '">';
         if ($carrierName === 'KolayGelsin') {
-            echo '<div class="form-group"><label>API Token</label><input type="text" name="api_token" placeholder="Bearer API Token"></div>';
+            echo '<div class="form-group"><label>API Token</label><input type="text" name="api_token" placeholder="Bearer API Token" value="'.$api_token.'"></div>';
         } else {
             echo '<div class="form-row">';
             echo '<div class="form-group"><label>Username</label><input type="text" name="username" placeholder="API Username" value="'.$username.'"></div>';
