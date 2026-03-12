@@ -141,7 +141,16 @@ function renderTestForm(CarrierTester $tester, string $carrierName): void
         $customer_id = '789217';
     }
 
-    if ($carrierName === 'KolayGelsin') {
+    if ($carrierName === 'Surat') {
+        echo '<div class="form-row">';
+        echo '<div class="form-group"><label>Cari Kodu (kullaniciAdi)</label><input type="text" name="kullanici_adi" value="1038106246"></div>';
+        echo '<div class="form-group"><label>Cari Sifresi (sifre)</label><input type="password" name="sifre" value="123456"></div>';
+        echo '</div>';
+        echo '<div class="form-row">';
+        echo '<div class="form-group"><label>Cari Kodu (for tracking)</label><input type="text" name="cari_kodu" value="1038106246"></div>';
+        echo '<div class="form-group"><label>Web Servis Sifresi (webSifre)</label><input type="password" name="web_sifre" value="123456.Ff"></div>';
+        echo '</div>';
+    } elseif ($carrierName === 'KolayGelsin') {
         echo '<div class="form-group"><label>API Token</label><input type="text" name="api_token" placeholder="Bearer API Token" value="'.$api_token.'"></div>';
         echo '<div class="form-row">';
         echo '<div class="form-group"><label>Customer ID</label><input type="number" name="customer_id" placeholder="KolayGelsin Customer ID" value="'.$customer_id.'"></div>';
@@ -161,6 +170,13 @@ function renderTestForm(CarrierTester $tester, string $carrierName): void
     if ($carrierName === 'KolayGelsin') {
         echo '<div class="form-group"><label>Customer Specific Code</label><input type="text" name="customer_specific_code" placeholder="Your reference code (optional)"></div>';
         echo '<div class="form-group"><label>Package Type</label><select name="package_type"><option value="2">Koli (Box)</option><option value="1">Dosya (Document)</option></select></div>';
+    } elseif ($carrierName === 'Surat') {
+        echo '<div class="form-group"><label>OzelKargoTakipNo (your tracking code)</label><input type="text" name="tracking_number" placeholder="Auto-generated if empty"></div>';
+        echo '<div class="form-group"><label>Reference Number</label><input type="text" name="reference_number" placeholder="Optional: group shipments"></div>';
+        echo '<div class="form-row">';
+        echo '<div class="form-group"><label>Cargo Type</label><select name="cargo_type"><option value="3">Koli (Box)</option><option value="1">Dosya (Document)</option><option value="2">Mi</option></select></div>';
+        echo '<div class="form-group"><label>Cargo Content</label><input type="text" name="cargo_content" value="Test gonderim"></div>';
+        echo '</div>';
     } elseif ($carrierName === 'Aras') {
         echo '<div class="form-group"><label>Integration Code</label><input type="text" name="integration_code" placeholder="Order/integration code (required)"></div>';
         echo '<div class="form-group"><label>Invoice Number</label><input type="text" name="invoice_number" placeholder="Same as integration code if empty"></div>';
@@ -220,7 +236,15 @@ function handleCreateShipment(CarrierTester $tester): void
     $carrierName = $_POST['carrier'] ?? '';
 
     try {
-        if ($carrierName === 'KolayGelsin') {
+        if ($carrierName === 'Surat') {
+            $carrierParams = [
+                'kullaniciAdi' => $_POST['kullanici_adi'] ?? '',
+                'sifre' => $_POST['sifre'] ?? '',
+                'cariKodu' => $_POST['cari_kodu'] ?? '',
+                'webSifre' => $_POST['web_sifre'] ?? '',
+                'testMode' => (bool) ($_POST['test_mode'] ?? true),
+            ];
+        } elseif ($carrierName === 'KolayGelsin') {
             $carrierParams = [
                 'apiToken' => $_POST['api_token'] ?? '',
                 'customerId' => (int) ($_POST['customer_id'] ?? 0),
@@ -268,7 +292,20 @@ function handleCreateShipment(CarrierTester $tester): void
             ),
         ];
 
-        if ($carrierName === 'KolayGelsin') {
+        if ($carrierName === 'Surat') {
+            $trackingNumber = $_POST['tracking_number'] ?: ('OMN-' . time());
+            $requestData = [
+                'shipTo' => $shipTo,
+                'packages' => $packages,
+                'trackingNumber' => $trackingNumber,
+                'referenceNumber' => $_POST['reference_number'] ?? '',
+                'paymentType' => ($_POST['payment_type'] ?? 'sender') === 'sender'
+                    ? \Omniship\Common\Enum\PaymentType::SENDER
+                    : \Omniship\Common\Enum\PaymentType::RECEIVER,
+                'cargoType' => (int) ($_POST['cargo_type'] ?? 3),
+                'cargoContent' => $_POST['cargo_content'] ?? '',
+            ];
+        } elseif ($carrierName === 'KolayGelsin') {
             $requestData = [
                 'shipTo' => $shipTo,
                 'packages' => $packages,
@@ -309,7 +346,13 @@ function handleCreateShipment(CarrierTester $tester): void
             'message' => $response->getMessage(),
         ];
 
-        if ($carrierName === 'KolayGelsin') {
+        if ($carrierName === 'Surat') {
+            $savedRequestData = [
+                'carrier' => $carrierName,
+                'trackingNumber' => $trackingNumber,
+                'shipTo' => $shipTo->toArray(),
+            ];
+        } elseif ($carrierName === 'KolayGelsin') {
             $savedRequestData = [
                 'carrier' => $carrierName,
                 'customerSpecificCode' => $requestData['customerSpecificCode'] ?? null,
@@ -355,7 +398,7 @@ function handleTrack(CarrierTester $tester): void
     $carrierName = $_GET['carrier'] ?? '';
     $trackingNumber = $_GET['tracking'] ?? '';
 
-    $username = $password = $api_token = '';
+    $username = $password = $api_token = $cari_kodu = $web_sifre = '';
 
     if ($carrierName === 'Aras'){
         $username = 'neodyum';
@@ -365,6 +408,9 @@ function handleTrack(CarrierTester $tester): void
         $password = 'YK';
     }else if ($carrierName === 'KolayGelsin'){
         $api_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1bmlxdWVfbmFtZSI6IjI5ODM5MjA1MTEwIiwiY2hhbm5lbCI6IkludGVncmF0aW9uIiwiZW52aXJvbm1lbnQiOiJpbnRlZ3JhdGlvbiIsImlzcyI6ImxvY2FsaG9zdCIsImF1ZCI6ImFsbCIsImV4cCI6MTgwMzQwNDkwMCwibmJmIjoxNzcxODY4OTAwfQ.NmPbi6dLesP4PJUwUqf-CYKTdE_4z_hIkYJH8cpcuos';
+    }else if ($carrierName === 'Surat'){
+        $cari_kodu = '1038106246';
+        $web_sifre = '123456.Ff';
     }
 
     if (empty($trackingNumber)) {
@@ -373,7 +419,12 @@ function handleTrack(CarrierTester $tester): void
         echo '<form method="GET" action="/">';
         echo '<input type="hidden" name="action" value="track">';
         echo '<input type="hidden" name="carrier" value="' . htmlspecialchars($carrierName) . '">';
-        if ($carrierName === 'KolayGelsin') {
+        if ($carrierName === 'Surat') {
+            echo '<div class="form-row">';
+            echo '<div class="form-group"><label>Cari Kodu</label><input type="text" name="cari_kodu" value="'.$cari_kodu.'"></div>';
+            echo '<div class="form-group"><label>Web Servis Sifresi</label><input type="password" name="web_sifre" value="'.$web_sifre.'"></div>';
+            echo '</div>';
+        } elseif ($carrierName === 'KolayGelsin') {
             echo '<div class="form-group"><label>API Token</label><input type="text" name="api_token" placeholder="Bearer API Token" value="'.$api_token.'"></div>';
         } else {
             echo '<div class="form-row">';
@@ -388,7 +439,13 @@ function handleTrack(CarrierTester $tester): void
     }
 
     try {
-        if ($carrierName === 'KolayGelsin') {
+        if ($carrierName === 'Surat') {
+            $carrier = $tester->createCarrier($carrierName, [
+                'cariKodu' => $_GET['cari_kodu'] ?? '',
+                'webSifre' => $_GET['web_sifre'] ?? '',
+                'testMode' => true,
+            ]);
+        } elseif ($carrierName === 'KolayGelsin') {
             $carrier = $tester->createCarrier($carrierName, [
                 'apiToken' => $_GET['api_token'] ?? '',
                 'testMode' => true,
