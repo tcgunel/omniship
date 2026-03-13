@@ -141,7 +141,20 @@ function renderTestForm(CarrierTester $tester, string $carrierName): void
         $customer_id = '789217';
     }
 
-    if ($carrierName === 'Surat') {
+    if ($carrierName === 'HepsiJet') {
+        echo '<div class="form-row">';
+        echo '<div class="form-group"><label>Username</label><input type="text" name="username" placeholder="HepsiJet Username"></div>';
+        echo '<div class="form-group"><label>Password</label><input type="password" name="password" placeholder="HepsiJet Password"></div>';
+        echo '</div>';
+        echo '<div class="form-row">';
+        echo '<div class="form-group"><label>Company Name</label><input type="text" name="company_name" placeholder="Company name from HepsiJet"></div>';
+        echo '<div class="form-group"><label>Abbreviation Code</label><input type="text" name="abbreviation_code" placeholder="e.g. CMPNYNM"></div>';
+        echo '</div>';
+        echo '<div class="form-row">';
+        echo '<div class="form-group"><label>Company Address ID</label><input type="text" name="company_address_id" placeholder="Sender address ID from HepsiJet"></div>';
+        echo '<div class="form-group"><label>XDock Code</label><input type="text" name="xdock_code" placeholder="Cross-dock abbreviation code"></div>';
+        echo '</div>';
+    } elseif ($carrierName === 'Surat') {
         echo '<div class="form-row">';
         echo '<div class="form-group"><label>Cari Kodu (kullaniciAdi)</label><input type="text" name="kullanici_adi" value="1038106246"></div>';
         echo '<div class="form-group"><label>Cari Sifresi (sifre)</label><input type="password" name="sifre" value="123456"></div>';
@@ -156,6 +169,32 @@ function renderTestForm(CarrierTester $tester, string $carrierName): void
         echo '<div class="form-group"><label>Customer ID</label><input type="number" name="customer_id" placeholder="KolayGelsin Customer ID" value="'.$customer_id.'"></div>';
         echo '<div class="form-group"><label>Address ID</label><input type="number" name="address_id" placeholder="Sender Address ID" value="'.$address_id.'"></div>';
         echo '</div>';
+    } elseif ($carrierName === 'UPS') {
+        echo '<div class="form-row">';
+        echo '<div class="form-group"><label>Username</label><input type="text" name="username" placeholder="UPS Username"></div>';
+        echo '<div class="form-group"><label>Password</label><input type="password" name="password" placeholder="UPS Password"></div>';
+        echo '</div>';
+        echo '<div class="form-group"><label>Customer Number</label><input type="text" name="customer_number" placeholder="UPS Customer Number"></div>';
+    } elseif ($carrierName === 'FedEx') {
+        echo '<div class="form-row">';
+        echo '<div class="form-group"><label>Client ID</label><input type="text" name="client_id" placeholder="FedEx Client ID"></div>';
+        echo '<div class="form-group"><label>Client Secret</label><input type="password" name="client_secret" placeholder="FedEx Client Secret"></div>';
+        echo '</div>';
+        echo '<div class="form-group"><label>Account Number</label><input type="text" name="account_number" placeholder="FedEx Account Number"></div>';
+    } elseif ($carrierName === 'DHL_Express') {
+        echo '<div class="form-row">';
+        echo '<div class="form-group"><label>API Key (username)</label><input type="text" name="username" placeholder="MyDHL API Key"></div>';
+        echo '<div class="form-group"><label>API Secret (password)</label><input type="password" name="password" placeholder="MyDHL API Secret"></div>';
+        echo '</div>';
+        echo '<div class="form-group"><label>Account Number</label><input type="text" name="account_number" placeholder="DHL Account Number (9-10 digits)"></div>';
+    } elseif ($carrierName === 'PTT') {
+        echo '<div class="form-row">';
+        echo '<div class="form-group"><label>Müşteri ID</label><input type="text" name="musteri_id" placeholder="PTT Customer ID"></div>';
+        echo '<div class="form-group"><label>Şifre</label><input type="password" name="sifre" placeholder="PTT Password"></div>';
+        echo '</div>';
+    } elseif ($carrierName === 'Horoz') {
+        echo '<div class="form-group"><label>Process Key</label><input type="text" name="process_key" placeholder="Horoz Process Key"></div>';
+        echo '<div class="form-group"><label>Sender Code</label><input type="number" name="sender_code" placeholder="Horoz Sender Code"></div>';
     } else {
         echo '<div class="form-row">';
         echo '<div class="form-group"><label>Username</label><input type="text" name="username" placeholder="API Username" value="'.$username.'"></div>';
@@ -167,7 +206,13 @@ function renderTestForm(CarrierTester $tester, string $carrierName): void
 
     echo '<h3 style="margin:20px 0 15px">Shipment Reference</h3>';
     echo '<div class="form-row">';
-    if ($carrierName === 'KolayGelsin') {
+    if ($carrierName === 'HepsiJet') {
+        echo '<div class="form-group"><label>Customer Delivery No (barcode, 9-16 chars, prefixed with abbreviation code)</label><input type="text" name="customer_delivery_no" placeholder="e.g. CMPNYNM123456789"></div>';
+        echo '<div class="form-row">';
+        echo '<div class="form-group"><label>Delivery Type</label><select name="delivery_type"><option value="RETAIL">Retail</option><option value="MARKET_PLACE">Marketplace</option><option value="EXPRESS">Express</option></select></div>';
+        echo '<div class="form-group"><label>Product Code</label><select name="product_code"><option value="HX_STD">Standard (HX_STD)</option><option value="HX_SD">Same Day (HX_SD)</option><option value="HX_ND">Next Day (HX_ND)</option><option value="HX_EX">Express (HX_EX)</option></select></div>';
+        echo '</div>';
+    } elseif ($carrierName === 'KolayGelsin') {
         echo '<div class="form-group"><label>Customer Specific Code</label><input type="text" name="customer_specific_code" placeholder="Your reference code (optional)"></div>';
         echo '<div class="form-group"><label>Package Type</label><select name="package_type"><option value="2">Koli (Box)</option><option value="1">Dosya (Document)</option></select></div>';
     } elseif ($carrierName === 'Surat') {
@@ -181,6 +226,36 @@ function renderTestForm(CarrierTester $tester, string $carrierName): void
         echo '<div class="form-group"><label>Integration Code</label><input type="text" name="integration_code" placeholder="Order/integration code (required)"></div>';
         echo '<div class="form-group"><label>Invoice Number</label><input type="text" name="invoice_number" placeholder="Same as integration code if empty"></div>';
         echo '<div class="form-group"><label>Barcodes (comma-separated, one per piece)</label><input type="text" name="barcodes" placeholder="e.g. ABC123,ABC124"></div>';
+    } elseif ($carrierName === 'UPS') {
+        echo '<div class="form-group"><label>Reference</label><input type="text" name="reference" placeholder="Customer reference (optional)"></div>';
+        echo '<div class="form-group"><label>Invoice Number</label><input type="text" name="invoice_number" placeholder="Invoice number (optional)"></div>';
+        echo '<div class="form-row">';
+        echo '<div class="form-group"><label>Shipper City Code</label><input type="number" name="shipper_city_code" placeholder="UPS city code (e.g. 34)"></div>';
+        echo '<div class="form-group"><label>Shipper Area Code</label><input type="number" name="shipper_area_code" placeholder="UPS area code"></div>';
+        echo '</div>';
+        echo '<div class="form-row">';
+        echo '<div class="form-group"><label>Consignee City Code</label><input type="number" name="consignee_city_code" placeholder="UPS city code (e.g. 6)"></div>';
+        echo '<div class="form-group"><label>Consignee Area Code</label><input type="number" name="consignee_area_code" placeholder="UPS area code"></div>';
+        echo '</div>';
+        echo '<div class="form-row">';
+        echo '<div class="form-group"><label>Service Level</label><select name="service_level"><option value="3">Standard (3)</option><option value="1">Express (1)</option><option value="2">Economy (2)</option></select></div>';
+        echo '<div class="form-group"><label>Package Type</label><select name="package_type"><option value="K">Koli (K)</option><option value="D">Dosya (D)</option><option value="P">Paket (P)</option></select></div>';
+        echo '</div>';
+    } elseif ($carrierName === 'FedEx') {
+        echo '<div class="form-group"><label>Service Type</label><select name="service_type"><option value="FEDEX_GROUND">FedEx Ground</option><option value="FEDEX_INTERNATIONAL_PRIORITY">International Priority</option><option value="FEDEX_INTERNATIONAL_ECONOMY">International Economy</option><option value="FEDEX_EXPRESS_SAVER">Express Saver</option></select></div>';
+    } elseif ($carrierName === 'DHL_Express') {
+        echo '<div class="form-row">';
+        echo '<div class="form-group"><label>Product Code</label><select name="product_code"><option value="P">Express Worldwide (P)</option><option value="D">Express Worldwide (D)</option><option value="U">Express Worldwide (U)</option><option value="K">Express 9:00</option><option value="N">Domestic Express</option></select></div>';
+        echo '<div class="form-group"><label>Planned Shipping Date</label><input type="datetime-local" name="planned_shipping_date"></div>';
+        echo '</div>';
+    } elseif ($carrierName === 'PTT') {
+        echo '<div class="form-group"><label>Barcode (required, pre-allocated)</label><input type="text" name="barcode" placeholder="e.g. PTT0000012345678" required></div>';
+        echo '<div class="form-group"><label>Reference Number</label><input type="text" name="reference_number" placeholder="Optional reference"></div>';
+    } elseif ($carrierName === 'MNG') {
+        echo '<div class="form-group"><label>Order Number (required)</label><input type="text" name="order_number" placeholder="e.g. OMN-001"></div>';
+        echo '<div class="form-group"><label>Barcode Text</label><input type="text" name="barcode_text" placeholder="Same as order number if empty"></div>';
+    } elseif ($carrierName === 'Horoz') {
+        echo '<div class="form-group"><label>Request Number (required)</label><input type="text" name="request_number" placeholder="e.g. REQ-001" required></div>';
     } else {
         echo '<div class="form-group"><label>Cargo Key</label><input type="text" name="cargo_key" placeholder="Auto-generated if empty"></div>';
         echo '<div class="form-group"><label>Invoice Key</label><input type="text" name="invoice_key" placeholder="Same as cargo key if empty"></div>';
@@ -236,7 +311,17 @@ function handleCreateShipment(CarrierTester $tester): void
     $carrierName = $_POST['carrier'] ?? '';
 
     try {
-        if ($carrierName === 'Surat') {
+        if ($carrierName === 'HepsiJet') {
+            $carrierParams = [
+                'username' => $_POST['username'] ?? '',
+                'password' => $_POST['password'] ?? '',
+                'companyName' => $_POST['company_name'] ?? '',
+                'abbreviationCode' => $_POST['abbreviation_code'] ?? '',
+                'companyAddressId' => $_POST['company_address_id'] ?? '',
+                'currentXDockCode' => $_POST['xdock_code'] ?? '',
+                'testMode' => (bool) ($_POST['test_mode'] ?? true),
+            ];
+        } elseif ($carrierName === 'Surat') {
             $carrierParams = [
                 'kullaniciAdi' => $_POST['kullanici_adi'] ?? '',
                 'sifre' => $_POST['sifre'] ?? '',
@@ -249,6 +334,39 @@ function handleCreateShipment(CarrierTester $tester): void
                 'apiToken' => $_POST['api_token'] ?? '',
                 'customerId' => (int) ($_POST['customer_id'] ?? 0),
                 'addressId' => (int) ($_POST['address_id'] ?? 0),
+                'testMode' => (bool) ($_POST['test_mode'] ?? true),
+            ];
+        } elseif ($carrierName === 'UPS') {
+            $carrierParams = [
+                'username' => $_POST['username'] ?? '',
+                'password' => $_POST['password'] ?? '',
+                'customerNumber' => $_POST['customer_number'] ?? '',
+                'testMode' => (bool) ($_POST['test_mode'] ?? true),
+            ];
+        } elseif ($carrierName === 'FedEx') {
+            $carrierParams = [
+                'clientId' => $_POST['client_id'] ?? '',
+                'clientSecret' => $_POST['client_secret'] ?? '',
+                'accountNumber' => $_POST['account_number'] ?? '',
+                'testMode' => (bool) ($_POST['test_mode'] ?? true),
+            ];
+        } elseif ($carrierName === 'DHL_Express') {
+            $carrierParams = [
+                'username' => $_POST['username'] ?? '',
+                'password' => $_POST['password'] ?? '',
+                'accountNumber' => $_POST['account_number'] ?? '',
+                'testMode' => (bool) ($_POST['test_mode'] ?? true),
+            ];
+        } elseif ($carrierName === 'PTT') {
+            $carrierParams = [
+                'musteriId' => $_POST['musteri_id'] ?? '',
+                'sifre' => $_POST['sifre'] ?? '',
+                'testMode' => (bool) ($_POST['test_mode'] ?? true),
+            ];
+        } elseif ($carrierName === 'Horoz') {
+            $carrierParams = [
+                'processKey' => $_POST['process_key'] ?? '',
+                'senderCode' => (int) ($_POST['sender_code'] ?? 0),
                 'testMode' => (bool) ($_POST['test_mode'] ?? true),
             ];
         } else {
@@ -292,7 +410,17 @@ function handleCreateShipment(CarrierTester $tester): void
             ),
         ];
 
-        if ($carrierName === 'Surat') {
+        if ($carrierName === 'HepsiJet') {
+            $customerDeliveryNo = $_POST['customer_delivery_no'] ?: (($_POST['abbreviation_code'] ?? 'OMN') . time());
+            $requestData = [
+                'shipFrom' => $shipFrom,
+                'shipTo' => $shipTo,
+                'packages' => $packages,
+                'customerDeliveryNo' => $customerDeliveryNo,
+                'deliveryType' => $_POST['delivery_type'] ?? 'RETAIL',
+                'productCode' => $_POST['product_code'] ?? 'HX_STD',
+            ];
+        } elseif ($carrierName === 'Surat') {
             $trackingNumber = $_POST['tracking_number'] ?: ('OMN-' . time());
             $requestData = [
                 'shipTo' => $shipTo,
@@ -324,6 +452,75 @@ function handleCreateShipment(CarrierTester $tester): void
                 'tradingWaybillNumber' => $integrationCode,
                 'barcodes' => $barcodes,
             ];
+        } elseif ($carrierName === 'UPS') {
+            $requestData = [
+                'shipFrom' => $shipFrom,
+                'shipTo' => $shipTo,
+                'packages' => $packages,
+                'shipperCityCode' => (int) ($_POST['shipper_city_code'] ?? 0),
+                'shipperAreaCode' => (int) ($_POST['shipper_area_code'] ?? 0),
+                'consigneeCityCode' => (int) ($_POST['consignee_city_code'] ?? 0),
+                'consigneeAreaCode' => (int) ($_POST['consignee_area_code'] ?? 0),
+                'serviceLevel' => (int) ($_POST['service_level'] ?? 3),
+                'packageType' => $_POST['package_type'] ?? 'K',
+                'reference' => $_POST['reference'] ?? '',
+                'invoiceNumber' => $_POST['invoice_number'] ?? '',
+                'paymentType' => ($_POST['payment_type'] ?? 'sender') === 'sender'
+                    ? \Omniship\Common\Enum\PaymentType::SENDER
+                    : \Omniship\Common\Enum\PaymentType::RECEIVER,
+            ];
+        } elseif ($carrierName === 'FedEx') {
+            $requestData = [
+                'shipFrom' => $shipFrom,
+                'shipTo' => $shipTo,
+                'packages' => $packages,
+                'serviceType' => $_POST['service_type'] ?? 'FEDEX_GROUND',
+            ];
+        } elseif ($carrierName === 'DHL_Express') {
+            $requestData = [
+                'shipFrom' => $shipFrom,
+                'shipTo' => $shipTo,
+                'packages' => $packages,
+                'productCode' => $_POST['product_code'] ?? 'P',
+            ];
+            if (!empty($_POST['planned_shipping_date'])) {
+                $requestData['plannedShippingDate'] = date('Y-m-d\TH:i:s \G\M\T+00:00', strtotime($_POST['planned_shipping_date']));
+            }
+        } elseif ($carrierName === 'PTT') {
+            $requestData = [
+                'shipFrom' => $shipFrom,
+                'shipTo' => $shipTo,
+                'packages' => $packages,
+                'barcode' => $_POST['barcode'] ?? '',
+                'referenceNumber' => $_POST['reference_number'] ?? '',
+                'paymentType' => ($_POST['payment_type'] ?? 'sender') === 'sender'
+                    ? \Omniship\Common\Enum\PaymentType::SENDER
+                    : \Omniship\Common\Enum\PaymentType::RECEIVER,
+            ];
+        } elseif ($carrierName === 'MNG') {
+            $orderNumber = $_POST['order_number'] ?: ('OMN-' . time());
+            $barcodeText = $_POST['barcode_text'] ?: $orderNumber;
+            $requestData = [
+                'shipFrom' => $shipFrom,
+                'shipTo' => $shipTo,
+                'packages' => $packages,
+                'orderNumber' => $orderNumber,
+                'barcodeText' => $barcodeText,
+                'paymentType' => ($_POST['payment_type'] ?? 'sender') === 'sender'
+                    ? \Omniship\Common\Enum\PaymentType::SENDER
+                    : \Omniship\Common\Enum\PaymentType::RECEIVER,
+            ];
+        } elseif ($carrierName === 'Horoz') {
+            $requestNumber = $_POST['request_number'] ?: ('REQ-' . time());
+            $requestData = [
+                'shipFrom' => $shipFrom,
+                'shipTo' => $shipTo,
+                'packages' => $packages,
+                'requestNumber' => $requestNumber,
+                'paymentType' => ($_POST['payment_type'] ?? 'sender') === 'sender'
+                    ? \Omniship\Common\Enum\PaymentType::SENDER
+                    : \Omniship\Common\Enum\PaymentType::RECEIVER,
+            ];
         } else {
             $cargoKey = $_POST['cargo_key'] ?? ('OMN-' . time());
             $invoiceKey = $_POST['invoice_key'] ?? $cargoKey;
@@ -346,7 +543,14 @@ function handleCreateShipment(CarrierTester $tester): void
             'message' => $response->getMessage(),
         ];
 
-        if ($carrierName === 'Surat') {
+        if ($carrierName === 'HepsiJet') {
+            $savedRequestData = [
+                'carrier' => $carrierName,
+                'customerDeliveryNo' => $customerDeliveryNo,
+                'shipTo' => $shipTo->toArray(),
+                'shipFrom' => $shipFrom->toArray(),
+            ];
+        } elseif ($carrierName === 'Surat') {
             $savedRequestData = [
                 'carrier' => $carrierName,
                 'trackingNumber' => $trackingNumber,
@@ -364,6 +568,49 @@ function handleCreateShipment(CarrierTester $tester): void
                 'integrationCode' => $integrationCode,
                 'invoiceNumber' => $invoiceNumber,
                 'shipTo' => $shipTo->toArray(),
+            ];
+        } elseif ($carrierName === 'UPS') {
+            $savedRequestData = [
+                'carrier' => $carrierName,
+                'reference' => $_POST['reference'] ?? '',
+                'shipTo' => $shipTo->toArray(),
+                'shipFrom' => $shipFrom->toArray(),
+            ];
+        } elseif ($carrierName === 'FedEx') {
+            $savedRequestData = [
+                'carrier' => $carrierName,
+                'serviceType' => $_POST['service_type'] ?? '',
+                'shipTo' => $shipTo->toArray(),
+                'shipFrom' => $shipFrom->toArray(),
+            ];
+        } elseif ($carrierName === 'DHL_Express') {
+            $savedRequestData = [
+                'carrier' => $carrierName,
+                'productCode' => $_POST['product_code'] ?? 'P',
+                'shipTo' => $shipTo->toArray(),
+                'shipFrom' => $shipFrom->toArray(),
+            ];
+        } elseif ($carrierName === 'PTT') {
+            $savedRequestData = [
+                'carrier' => $carrierName,
+                'barcode' => $_POST['barcode'] ?? '',
+                'shipTo' => $shipTo->toArray(),
+                'shipFrom' => $shipFrom->toArray(),
+            ];
+        } elseif ($carrierName === 'MNG') {
+            $savedRequestData = [
+                'carrier' => $carrierName,
+                'orderNumber' => $orderNumber,
+                'barcodeText' => $barcodeText,
+                'shipTo' => $shipTo->toArray(),
+                'shipFrom' => $shipFrom->toArray(),
+            ];
+        } elseif ($carrierName === 'Horoz') {
+            $savedRequestData = [
+                'carrier' => $carrierName,
+                'requestNumber' => $requestNumber,
+                'shipTo' => $shipTo->toArray(),
+                'shipFrom' => $shipFrom->toArray(),
             ];
         } else {
             $savedRequestData = [
@@ -413,19 +660,54 @@ function handleTrack(CarrierTester $tester): void
         $web_sifre = '123456.Ff';
     }
 
+    if ($carrierName === 'Horoz') {
+        echo "<h2>Track Shipment - {$carrierName}</h2>";
+        echo '<div class="alert alert-info">Horoz Lojistik does not provide a tracking query endpoint. Tracking information is returned in the createBarcode response.</div>';
+        echo '<p><a href="/">Back to Carriers</a></p>';
+        return;
+    }
+
     if (empty($trackingNumber)) {
         echo "<h2>Track Shipment - {$carrierName}</h2>";
         echo '<div class="card">';
         echo '<form method="GET" action="/">';
         echo '<input type="hidden" name="action" value="track">';
         echo '<input type="hidden" name="carrier" value="' . htmlspecialchars($carrierName) . '">';
-        if ($carrierName === 'Surat') {
+        if ($carrierName === 'HepsiJet') {
+            echo '<div class="form-row">';
+            echo '<div class="form-group"><label>Username</label><input type="text" name="username" placeholder="HepsiJet Username"></div>';
+            echo '<div class="form-group"><label>Password</label><input type="password" name="password" placeholder="HepsiJet Password"></div>';
+            echo '</div>';
+        } elseif ($carrierName === 'Surat') {
             echo '<div class="form-row">';
             echo '<div class="form-group"><label>Cari Kodu</label><input type="text" name="cari_kodu" value="'.$cari_kodu.'"></div>';
             echo '<div class="form-group"><label>Web Servis Sifresi</label><input type="password" name="web_sifre" value="'.$web_sifre.'"></div>';
             echo '</div>';
         } elseif ($carrierName === 'KolayGelsin') {
             echo '<div class="form-group"><label>API Token</label><input type="text" name="api_token" placeholder="Bearer API Token" value="'.$api_token.'"></div>';
+        } elseif ($carrierName === 'UPS') {
+            echo '<div class="form-row">';
+            echo '<div class="form-group"><label>Username</label><input type="text" name="username" placeholder="UPS Username"></div>';
+            echo '<div class="form-group"><label>Password</label><input type="password" name="password" placeholder="UPS Password"></div>';
+            echo '</div>';
+            echo '<div class="form-group"><label>Customer Number</label><input type="text" name="customer_number" placeholder="UPS Customer Number"></div>';
+        } elseif ($carrierName === 'FedEx') {
+            echo '<div class="form-row">';
+            echo '<div class="form-group"><label>Client ID</label><input type="text" name="client_id" placeholder="FedEx Client ID"></div>';
+            echo '<div class="form-group"><label>Client Secret</label><input type="password" name="client_secret" placeholder="FedEx Client Secret"></div>';
+            echo '</div>';
+            echo '<div class="form-group"><label>Account Number</label><input type="text" name="account_number" placeholder="FedEx Account Number"></div>';
+        } elseif ($carrierName === 'DHL_Express') {
+            echo '<div class="form-row">';
+            echo '<div class="form-group"><label>API Key (username)</label><input type="text" name="username" placeholder="MyDHL API Key"></div>';
+            echo '<div class="form-group"><label>API Secret (password)</label><input type="password" name="password" placeholder="MyDHL API Secret"></div>';
+            echo '</div>';
+            echo '<div class="form-group"><label>Account Number</label><input type="text" name="account_number" placeholder="DHL Account Number"></div>';
+        } elseif ($carrierName === 'PTT') {
+            echo '<div class="form-row">';
+            echo '<div class="form-group"><label>Müşteri ID</label><input type="text" name="musteri_id" placeholder="PTT Customer ID"></div>';
+            echo '<div class="form-group"><label>Şifre</label><input type="password" name="sifre" placeholder="PTT Password"></div>';
+            echo '</div>';
         } else {
             echo '<div class="form-row">';
             echo '<div class="form-group"><label>Username</label><input type="text" name="username" placeholder="API Username" value="'.$username.'"></div>';
@@ -439,7 +721,13 @@ function handleTrack(CarrierTester $tester): void
     }
 
     try {
-        if ($carrierName === 'Surat') {
+        if ($carrierName === 'HepsiJet') {
+            $carrier = $tester->createCarrier($carrierName, [
+                'username' => $_GET['username'] ?? '',
+                'password' => $_GET['password'] ?? '',
+                'testMode' => true,
+            ]);
+        } elseif ($carrierName === 'Surat') {
             $carrier = $tester->createCarrier($carrierName, [
                 'cariKodu' => $_GET['cari_kodu'] ?? '',
                 'webSifre' => $_GET['web_sifre'] ?? '',
@@ -448,6 +736,33 @@ function handleTrack(CarrierTester $tester): void
         } elseif ($carrierName === 'KolayGelsin') {
             $carrier = $tester->createCarrier($carrierName, [
                 'apiToken' => $_GET['api_token'] ?? '',
+                'testMode' => true,
+            ]);
+        } elseif ($carrierName === 'UPS') {
+            $carrier = $tester->createCarrier($carrierName, [
+                'username' => $_GET['username'] ?? '',
+                'password' => $_GET['password'] ?? '',
+                'customerNumber' => $_GET['customer_number'] ?? '',
+                'testMode' => true,
+            ]);
+        } elseif ($carrierName === 'FedEx') {
+            $carrier = $tester->createCarrier($carrierName, [
+                'clientId' => $_GET['client_id'] ?? '',
+                'clientSecret' => $_GET['client_secret'] ?? '',
+                'accountNumber' => $_GET['account_number'] ?? '',
+                'testMode' => true,
+            ]);
+        } elseif ($carrierName === 'DHL_Express') {
+            $carrier = $tester->createCarrier($carrierName, [
+                'username' => $_GET['username'] ?? '',
+                'password' => $_GET['password'] ?? '',
+                'accountNumber' => $_GET['account_number'] ?? '',
+                'testMode' => true,
+            ]);
+        } elseif ($carrierName === 'PTT') {
+            $carrier = $tester->createCarrier($carrierName, [
+                'musteriId' => $_GET['musteri_id'] ?? '',
+                'sifre' => $_GET['sifre'] ?? '',
                 'testMode' => true,
             ]);
         } else {

@@ -52,6 +52,13 @@ class CarrierTester
             'KolayGelsin' => 'Kolay Gelsin (REST)',
             'Aras' => 'Aras Kargo (SOAP/REST)',
             'Surat' => 'Sürat Kargo (SOAP)',
+            'HepsiJet' => 'HepsiJet (REST)',
+            'UPS' => 'UPS Kargo (SOAP)',
+            'MNG' => 'MNG Kargo (SOAP/REST)',
+            'PTT' => 'PTT Kargo (SOAP)',
+            'Horoz' => 'Horoz Lojistik (REST)',
+            'FedEx' => 'FedEx (REST/OAuth)',
+            'DHL_Express' => 'DHL Express (REST)',
         ];
     }
 
