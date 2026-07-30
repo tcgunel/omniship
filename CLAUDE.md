@@ -15,9 +15,14 @@ Multi-carrier shipping abstraction library for PHP. Like Omnipay, but for shippi
 
 ```
 AbstractCarrier
-  ├── AbstractHttpCarrier    → REST/JSON carriers (UPS, FedEx, DHL, HepsiJet)
-  └── AbstractSoapCarrier    → SOAP/XML carriers (Yurtiçi, Aras, PTT, Sürat, MNG)
+  ├── AbstractHttpCarrier    → REST/JSON carriers (UPS, FedEx, DHL, HepsiJet, Aras, MNG, KolayGelsin, Horoz)
+  └── AbstractSoapCarrier    → SOAP/XML carriers (Yurtiçi, PTT, Sürat)
 ```
+
+The two take different constructor arguments — a PSR-18 client vs a
+`SoapClient` — so ask `Omniship::isSoap($name)` before instantiating rather
+than assuming. SOAP carriers accept a `setSoapClientFactory()` callback when the
+consumer needs to wrap their traffic.
 
 Each carrier is a separate namespace: `Omniship\UPS\Carrier`, `Omniship\Yurtici\Carrier`, etc.
 

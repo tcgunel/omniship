@@ -3,7 +3,7 @@
 
 # Sub-packages (separate git repos)
 /omniship/
-/omniship-yurtici/
+/omniship-*/
 
 # Docker
 docker-compose.override.yml
